@@ -22,7 +22,22 @@
                 <property name="width-request">281</property>
                 <child>
                   <object class="GtkPicture" id="img_logo">
-                    <property name="file">../gfx/pronatura.png</property>
+                    <property name="file">../gfx/prowywoz.png</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box_providers">
+                <child>
+                  <object class="GtkLabel" id="lbl_provider">
+                    <property name="label">Usługodawca:</property>
+                    <property name="width-request">130</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkDropDown" id="dd_providers">
+                    <property name="width-request">300</property>
                   </object>
                 </child>
               </object>
