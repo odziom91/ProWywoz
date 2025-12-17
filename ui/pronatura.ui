@@ -37,7 +37,7 @@
                 </child>
                 <child>
                   <object class="GtkDropDown" id="dd_providers">
-                    <property name="width-request">300</property>
+                    <property name="width-request">370</property>
                   </object>
                 </child>
               </object>
@@ -56,7 +56,7 @@
                     <property name="enable-search">True</property>
                     <property name="search-match-mode">substring</property>
                     <property name="selected">0</property>
-                    <property name="width-request">300</property>
+                    <property name="width-request">370</property>
                   </object>
                 </child>
               </object>
@@ -73,7 +73,7 @@
                 <child>
                   <object class="GtkDropDown" id="dd_buildings">
                     <property name="selected">0</property>
-                    <property name="width-request">300</property>
+                    <property name="width-request">370</property>
                   </object>
                 </child>
               </object>
@@ -82,6 +82,7 @@
               <object class="GtkBox" id="box_actions">
                 <property name="baseline-position">bottom</property>
                 <property name="halign">center</property>
+                <property name="spacing">12</property>
                 <child>
                   <object class="GtkButton" id="btn_create_ics">
                     <property name="can-focus">False</property>
@@ -92,13 +93,14 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="btn_download_pdf">
-                    <property name="label">Pobierz PDF</property>
+                    <property name="label">Pobierz plik PDF</property>
                     <property name="width-request">150</property>
                   </object>
                 </child>
                 <child>
                   <object class="GtkButton" id="btn_about">
                     <property name="label">O ProWywóz</property>
+                    <property name="width-request">150</property>
                   </object>
                 </child>
               </object>
