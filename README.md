@@ -1,4 +1,4 @@
-# ProWywóz 0.1
+# ProWywóz 0.2.0
 
 ## -- PL --
 
