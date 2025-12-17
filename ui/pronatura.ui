@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.96.3 -->
+<interface>
+  <!-- interface-name pronatura.ui -->
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <object class="AdwApplicationWindow" id="ProNatura">
+    <property name="content">
+      <object class="AdwToolbarView" id="tb_ProNatura">
+        <property name="content">
+          <object class="GtkBox" id="box_main">
+            <property name="margin-bottom">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-start">12</property>
+            <property name="margin-top">12</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">12</property>
+            <child>
+              <object class="GtkBox" id="box_title">
+                <property name="height-request">104</property>
+                <property name="orientation">vertical</property>
+                <property name="width-request">281</property>
+                <child>
+                  <object class="GtkPicture" id="img_logo">
+                    <property name="file">../gfx/pronatura.png</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box_streets">
+                <child>
+                  <object class="GtkLabel" id="lbl_street">
+                    <property name="justify">right</property>
+                    <property name="label">Ulica:</property>
+                    <property name="width-request">130</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkDropDown" id="dd_streets">
+                    <property name="enable-search">True</property>
+                    <property name="search-match-mode">substring</property>
+                    <property name="selected">0</property>
+                    <property name="width-request">300</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box_buildings">
+                <child>
+                  <object class="GtkLabel" id="lbl_building_nr">
+                    <property name="justify">right</property>
+                    <property name="label">Numer budynku:</property>
+                    <property name="width-request">130</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkDropDown" id="dd_buildings">
+                    <property name="selected">0</property>
+                    <property name="width-request">300</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box_actions">
+                <property name="baseline-position">bottom</property>
+                <property name="halign">center</property>
+                <child>
+                  <object class="GtkButton" id="btn_create_ics">
+                    <property name="can-focus">False</property>
+                    <property name="can-target">False</property>
+                    <property name="label">Utwórz plik kalendarza</property>
+                    <property name="width-request">150</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_download_pdf">
+                    <property name="label">Pobierz PDF</property>
+                    <property name="width-request">150</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_about">
+                    <property name="label">O ProWywóz</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+        <child type="top">
+          <object class="AdwHeaderBar" id="titlebar"/>
+        </child>
+      </object>
+    </property>
+  </object>
+</interface>
