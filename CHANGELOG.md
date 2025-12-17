@@ -5,7 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## [0.1] - 2025-12-17
+## [0.2.0] - 2025-12-17
+
+### Added
+
+- error & info dialogs
+- exceptions for different API scenarios
+
+### Changed
+
+- github url for raising issues with the app
+- log filename
+
+### Fixed
+
+- issues with not selected streets and buildings
+
+## [0.1.0] - 2025-12-17
 
 - initial release
 
