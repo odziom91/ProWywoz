@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [version] - 2025-12-18
+
+### Added
+
+- service providers section
+- CORIMP search engine support (beta version)
+- load_providers function
+- load_streets function with new logic
+- load_buildings function with new logic
+
+### Changed
+
+- UI: service providers
+- UI: spacing of buttons
+- UI: buttons labels
+- UI: buttons sizes
+- some file names
+
+### Deprecated
+
+- dl_buildings - old download buildings function
+- dl_pdf - old pdf download fuction
+
+### Removed
+
+- maximize button in main window
+
+### Fixed
+
+- bad url in PDF download ProNatura_api.save_pdf function
+- bad default exception text for ProNatura_api.save_pdf - replaced "Nie można pobrać numerów budynków." to "Nie można pobrać pliku PDF."
+
 ## [0.2.0] - 2025-12-17
 
 ### Added
