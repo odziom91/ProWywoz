@@ -112,5 +112,6 @@
         </child>
       </object>
     </property>
+    <property name="resizable">False</property>
   </object>
 </interface>

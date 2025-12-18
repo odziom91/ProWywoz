@@ -1,6 +1,6 @@
 #
 # ProWywóz
-# v.0.2.0
+# v.0.3.0
 #
 
 import gi
@@ -44,6 +44,7 @@ class Corimp_api():
         return r_json_buildings
     
     def save_pdf(self, dialog, result, point_id):
+        # get report and download PDF file
         try:
             pdf = '/reports'
             r_pdf = requests.get(f'{self.api}{pdf}?type=pdf&id={point_id}')
@@ -77,6 +78,7 @@ class Corimp_api():
 
 
     def error_dialog(self, t, b):
+        # error dialog
         err = Gtk.AlertDialog(
             buttons=['OK']
             )
@@ -85,6 +87,7 @@ class Corimp_api():
         err.show()
 
     def info_dialog(self, t, b):
+        # info dialog
         ifo = Gtk.AlertDialog(
             buttons=['OK']
         )
@@ -189,6 +192,7 @@ class ProNatura_api():
             raise Exception(f'Nie można pobrać pliku PDF. Nieznany błąd. {str(e)}')
         
     def error_dialog(self, t, b):
+        # error dialog
         err = Gtk.AlertDialog(
             buttons=['OK']
             )
@@ -197,6 +201,7 @@ class ProNatura_api():
         err.show()
 
     def info_dialog(self, t, b):
+        # info dialog
         ifo = Gtk.AlertDialog(
             buttons=['OK']
         )
@@ -209,11 +214,14 @@ class ProWywoz(Adw.Application):
         try:
             # about app
             self.app_name = 'ProWywóz'
-            self.app_version = '0.2.0'
+            self.app_version = '0.3.0'
             self.app_icon = os.path.join(os.path.dirname(__file__), "gfx")
             self.app_icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
             self.app_icon_theme.add_search_path(self.app_icon)
-            self.app_comments = 'Aplikacja do generowania harmonogramu odbioru odpadów w Bydgoszczy - usługi świadczonej przez MKUO ProNatura w Bydgoszczy'
+            self.app_comments = 'Aplikacja do generowania harmonogramu odbioru odpadów w Bydgoszczy.\n' \
+                'Program obsługuje poniższe wyszukiwarki:\n' \
+                '- usługa świadczona przez MKUO ProNatura \nSp. z o.o. w Bydgoszczy\n' \
+                '- usługa świadczona przez PUK CORIMP Sp. z o.o. \nw Bydgoszczy (wersja beta)'
             self.developers = ['Krzysztof Odziomek']
             self.designers = ['Krzysztof Odziomek']
             self.website = 'https://odziom.ovh/'
@@ -221,9 +229,9 @@ class ProWywoz(Adw.Application):
 
             # preload providers list
             self.list_providers = [
-            (1, 'MKUO ProNatura Sp. z o.o.'),
-            (2, 'PUK CORIMP Sp. z o.o.')
-        ]
+                (1, 'MKUO ProNatura Sp. z o.o.'),
+                (2, 'PUK CORIMP Sp. z o.o. (wersja beta)')
+            ]
             # preload ProNatura API
             self.pronatura = ProNatura_api()
 
@@ -280,6 +288,7 @@ class ProWywoz(Adw.Application):
             self.dd_streets.set_selected(1)
             self.dd_streets.set_sensitive(True)
 
+            # add search possibility for streets
             expression = Gtk.PropertyExpression.new(Gtk.StringObject, None, "string")
             self.dd_streets.set_expression(expression)
         except Exception as e:
@@ -290,7 +299,7 @@ class ProWywoz(Adw.Application):
         self.window.present()
     
     def about_app(self, button):
-
+        # about dialog
         ab = Adw.AboutDialog(
             title=f'{self.app_name} {self.app_version}',
             application_name=self.app_name,
@@ -306,6 +315,7 @@ class ProWywoz(Adw.Application):
         ab.present()
 
     def load_providers(self):
+        # load providers to the drop down menu
         self.providers_gtk_list = Gtk.StringList()
         self.providers_gtk_list.append('Nie wybrano z listy')
 
@@ -318,6 +328,7 @@ class ProWywoz(Adw.Application):
         self.dd_providers.set_sensitive(True)
 
     def load_streets(self, dropdown, *args):
+        # load streets to the drop down menu
         try:
             selected_pos = dropdown.get_selected()
             model = self.dd_providers.get_model()
@@ -356,6 +367,7 @@ class ProWywoz(Adw.Application):
             logging.error(f'Error: {str(e)}')
 
     def load_buildings(self, dropdown, *args):
+        # load buildings to the drop down menu
         try:
             match self.provider:
                 case 1:
@@ -406,6 +418,7 @@ class ProWywoz(Adw.Application):
             logging.error(f'Error: {str(e)}')
 
     def download_pdf_file(self, button):
+        # download pdf file
         try:
             match self.provider:
                 case 1:
@@ -470,49 +483,9 @@ class ProWywoz(Adw.Application):
         except Exception as e:
             self.error_dialog('Error', str(e))
             logging.error(f'Error: {str(e)}')
-
-    def dl_pdf(self, button):
-        try:
-            selected_pos = self.dd_buildings.get_selected()
-            model = self.dd_buildings.get_model()
-            selected_building = model[selected_pos].get_string()
-            for building in self.buildings:
-                if selected_building == building['buildingNumber']:
-                    self.building_id = building['id']
-
-            # set filter for files
-            file_filter = Gtk.FileFilter()
-            file_filter.set_name("Pliki PDF")
-            file_filter.add_pattern("*.pdf")
-            filters = Gio.ListStore.new(Gtk.FileFilter)
-            filters.append(file_filter)
-
-            # set up save dialog window
-            save_dialog = Gtk.FileDialog()
-            save_dialog.set_title('Zapisz harmonogram do pliku PDF jako...')
-            save_dialog.set_initial_name('harmonogram.pdf')
-            save_dialog.set_filters(filters)
-            save_dialog.set_default_filter(file_filter)
-
-            save_dialog.save(self.window, None, self.pronatura.save_pdf, self.building_id)
-            
-        except requests.exceptions.ConnectionError as e:
-            self.error_dialog('Błąd', f'{str(e)}')
-        except requests.exceptions.HTTPError as e:
-            self.error_dialog('Błąd', f'{str(e)}')
-        except TypeError as e:
-            if str(e) == "'NoneType' object is not subscriptable":
-                self.error_dialog('Błąd', 'Nie wybrano wszystkich wymaganych pól.')
-                logging.error(f'Error: Nie wybrano wszystkich wymaganych pól. {str(e)}')
-        except AttributeError as e:
-            if 'building_id' in str(e):
-                self.error_dialog('Błąd', 'Nie wybrano numeru budynku.')
-                logging.error(f'Error: Nie wybrano numeru budynku. {str(e)}')
-        except Exception as e:
-            self.error_dialog('Error', str(e))
-            logging.error(f'Error: {str(e)}')
         
     def error_dialog(self, t, b):
+        # error dialog
         err = Gtk.AlertDialog(
             buttons=['OK']
             )
@@ -521,6 +494,7 @@ class ProWywoz(Adw.Application):
         err.show()
 
     def info_dialog(self, t, b):
+        # info dialog
         ifo = Gtk.AlertDialog(
             buttons=['OK']
         )
