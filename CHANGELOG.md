@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
+## [0.4.0] - 2026-01-02
+
+### Added
+
+- ics Calendar file generator for ProNatura waste schedule
+- short note in README.md file about downloading the project
+
+### Changed
+
+- update requirements
+
+### Fixed
+
+- raise for status in r_pdf / r_download variables
+
 ## [0.3.0] - 2025-12-18
 
 ### Added
