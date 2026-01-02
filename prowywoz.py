@@ -9,6 +9,8 @@ import requests
 import json
 import os
 import logging
+from ics import Calendar, Event
+from datetime import datetime
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -155,6 +157,78 @@ class ProNatura_api():
             logging.error(f'Cannot load streets. Unknown error. {str(e)}')
             raise Exception(f'Nie można pobrać numerów budynków. Nieznany błąd. {str(e)}')
 
+    def save_ics(self, dialog, result, id):
+        # prepare ics Calendar file for selected point
+        try:
+            webpage = '/prod/trash-schedule'
+
+            # month numbers by names
+            month_mapping = {
+                "Styczeń": 1,
+                "Luty": 2,
+                "Marzec": 3,
+                "Kwiecień": 4,
+                "Maj": 5,
+                "Czerwiec": 6,
+                "Lipiec": 7,
+                "Sierpień": 8,
+                "Wrzesień": 9,
+                "Październik": 10,
+                "Listopad": 11,
+                "Grudzień": 12
+            }
+
+            # init Calendar
+            calendar = Calendar()
+
+            # get trash schedule
+            r_trash_schedule = requests.get(f'{self.api}{webpage}/{id}')
+            r_trash_schedule.raise_for_status()
+            trash_schedule = json.loads(r_trash_schedule.text)
+
+            # create events in calendar
+            y = trash_schedule['year']
+            for trash_month in trash_schedule['trashSchedule']:
+                month_name = trash_month['month']
+                m = month_mapping[month_name]
+                for month_schedule in trash_month['schedule']:
+                    trash_type = month_schedule['type']
+                    for d in month_schedule['days']:
+                        event_date = datetime(year=y, month=m, day=int(d))
+                        event = Event()
+                        event.name = trash_type
+                        event.begin = event_date.strftime("%Y-%m-%d")
+                        event.make_all_day()
+                        event.description = f"Wywóz: {trash_type}"
+                        calendar.events.add(event)
+
+            # save to the ics file
+            file = dialog.save_finish(result)
+            path = file.get_path()
+            logging.info('Saving to the file...')
+            with open(path, "w", encoding="utf-8") as f:
+                f.writelines(calendar)
+            self.info_dialog('Pobieranie harmonogramu do pliku kalendarza ICS', 'Plik z harmonogramem wywozu odpadów został pobrany pomyślnie.')
+
+        except requests.exceptions.ConnectionError as e:
+            self.error_dialog('Błąd', f'Nie można pobrać zawartości ze strony. API nieprawidłowe.\nJeśli problem będzie się potwarzał zgłoś błąd.')
+        except requests.exceptions.HTTPError as e:
+            logging.error(f'Cannot load streets. {str(e)}')
+            if r_trash_schedule.status_code == 403:
+                self.error_dialog('Błąd', f'Nie można pobrać zawartości ze strony. Dostęp zabroniony.\nJeśli problem będzie się powtarzał zgłoś błąd.')
+            if r_trash_schedule.status_code == 404:
+                self.error_dialog('Błąd', f'Nie można pobrać zawartości ze strony. Nieprawidłowy endpoint do API.\nJeśli problem będzie się powtarzał zgłoś błąd.')
+            if r_trash_schedule.status_code == 500:
+                self.error_dialog('Błąd', f'Nie można pobrać zawartości ze strony. Błąd serwera - spróbuj później.')
+            if r_trash_schedule.status_code == 502:
+                self.error_dialog('Błąd', f'Nie można pobrać zawartości ze strony. Błąd bramy - spróbuj później.')
+            if r_trash_schedule.status_code == 503:
+                self.error_dialog('Błąd', f'Nie można pobrać zawartości ze strony. Usługa niedostępna - spróbuj później.')
+        except Exception as e:
+            logging.error(f'Cannot load streets. Unknown error. {str(e)}')
+            raise Exception(f'Nie można pobrać zawartości ze strony. Nieznany błąd. {str(e)}')
+
+
     def save_pdf(self, dialog, result, id):
         # prepare pdf for selected point
         try:
@@ -166,7 +240,7 @@ class ProNatura_api():
             r_url = r_json['url']
             logging.info('Downloading pdf file...')
             r_download = requests.get(f'{r_url}')
-            r_pdf.raise_for_status()
+            r_download.raise_for_status()
             file = dialog.save_finish(result)
             path = file.get_path()
             logging.info('Saving to the file...')
@@ -214,7 +288,7 @@ class ProWywoz(Adw.Application):
         try:
             # about app
             self.app_name = 'ProWywóz'
-            self.app_version = '0.3.0'
+            self.app_version = '0.4.0'
             self.app_icon = os.path.join(os.path.dirname(__file__), "gfx")
             self.app_icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
             self.app_icon_theme.add_search_path(self.app_icon)
@@ -281,6 +355,10 @@ class ProWywoz(Adw.Application):
 
             # connect signals
             self.btn_download_pdf.connect('clicked', self.download_pdf_file)
+            self.btn_create_ics.connect('clicked', self.download_ics_file)
+            self.btn_create_ics.set_property('can_focus', True)
+            self.btn_create_ics.set_property('can_target', True)
+            
             self.btn_about.connect('clicked', self.about_app)
             self.dd_providers.connect('notify::selected', self.load_streets)
             self.dd_streets.connect('notify::selected', self.load_buildings)
@@ -468,6 +546,53 @@ class ProWywoz(Adw.Application):
                     save_dialog.set_default_filter(file_filter)
 
                     save_dialog.save(self.window, None, self.corimp.save_pdf, self.building_id)
+        except requests.exceptions.ConnectionError as e:
+            self.error_dialog('Błąd', f'{str(e)}')
+        except requests.exceptions.HTTPError as e:
+            self.error_dialog('Błąd', f'{str(e)}')
+        except TypeError as e:
+            if str(e) == "'NoneType' object is not subscriptable":
+                self.error_dialog('Błąd', 'Nie wybrano wszystkich wymaganych pól.')
+                logging.error(f'Error: Nie wybrano wszystkich wymaganych pól. {str(e)}')
+        except AttributeError as e:
+            if 'building_id' in str(e):
+                self.error_dialog('Błąd', 'Nie wybrano numeru budynku.')
+                logging.error(f'Error: Nie wybrano numeru budynku. {str(e)}')
+        except Exception as e:
+            self.error_dialog('Error', str(e))
+            logging.error(f'Error: {str(e)}')
+
+    def download_ics_file(self, button):
+        # download ics file
+        try:
+            match self.provider:
+                case 1:
+                    selected_pos = self.dd_buildings.get_selected()
+                    model = self.dd_buildings.get_model()
+                    selected_building = model[selected_pos].get_string()
+                    for building in self.buildings:
+                        if selected_building == building['buildingNumber']:
+                            self.building_id = building['id']
+                    
+                    # set filter for files
+                    file_filter = Gtk.FileFilter()
+                    file_filter.set_name("Pliki kalendarza ICS")
+                    file_filter.add_pattern("*.ics")
+                    filters = Gio.ListStore.new(Gtk.FileFilter)
+                    filters.append(file_filter)
+
+                    # set up save dialog window
+                    save_dialog = Gtk.FileDialog()
+                    save_dialog.set_title('Zapisz harmonogram do pliku kalendarza ICS jako...')
+                    save_dialog.set_initial_name('harmonogram.ics')
+                    save_dialog.set_filters(filters)
+                    save_dialog.set_default_filter(file_filter)
+
+                    save_dialog.save(self.window, None, self.pronatura.save_ics, self.building_id)
+
+                case 2:
+                    self.info_dialog('Ważna informacja!', 'W tej wersji aplikacji zapis do pliku kalendarza ICS\ndla PUK CORIMP Sp. z o.o. nie jest obsługiwany.')
+
         except requests.exceptions.ConnectionError as e:
             self.error_dialog('Błąd', f'{str(e)}')
         except requests.exceptions.HTTPError as e:
