@@ -1,4 +1,4 @@
-# ProWywóz 0.3.0
+# ProWywóz 0.4.0
 
 ## -- PL --
 
@@ -7,6 +7,31 @@ Aplikacja służy do generowania kalendarza odbioru odpadów na terenie Bydgoszc
 Dostępne wyszukiwarki:
 - usługa świadczona przez MKUO ProNatura Sp z o.o. w Bydgoszczy
 - usługa świadczona przez PUK CORIMP Sp z o.o. w Bydgoszczy (wersja beta)
+
+### Pobieranie aplikacji
+Aplikację przetestowano w Pythonie w wersji 3.13 i jest ona zalecana do działania. W przypadku starszych wersji Pythona nie ma 100% gwarancji.
+
+- Pobierz projekt z GitHuba:
+```
+git clone https://github.com/odziom91/ProWywoz.git
+```
+
+- Utwórz środowisko wirtualne (opcjonalnie):
+```
+pip install virtualenv
+python -m venv .venv
+source .venv\bin\activate
+```
+
+- Zainstaluj wymagane moduły przez pip:
+```
+pip install -r requirements.txt
+```
+
+- Uruchom aplikację:
+```
+python ./prowywoz.py
+```
 
 ### Jak działa aplikacja?
 Po uruchomieniu aplikacji wystarczy wybrać usługodawcę (dostępne: ProNatura oraz CORIMP), ulicę oraz numer budynku.
@@ -27,6 +52,31 @@ This app helps generate a waste collection calendar for Bydgoszcz.
 Available search engines:
 - service provided by MKUO ProNatura Sp. z o.o. in Bydgoszcz
 - service provided by PUK CORIMP Sp. z o.o. in Bydgoszcz (beta version)
+
+### Downloading the App
+The application was tested with Python version 3.13 and is recommended for use with it. For older Python versions, there is no 100% guarantee of compatibility.
+
+- Download the project from GitHub:
+```
+git clone https://github.com/odziom91/ProWywoz.git
+```
+
+-Create a virtual environment (optional):
+```
+pip install virtualenv
+python -m venv .venv
+source .venv\bin\activate
+```
+
+- Install the required modules via pip:
+```
+pip install -r requirements.txt
+```
+
+- Run the application:
+```
+python ./prowywoz.py
+```
 
 ### How does the App work?
 After starting the app, simply select service provider, street and building number.
