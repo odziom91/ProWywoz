@@ -1,3 +1,5 @@
-requests
 pygobject
 PyGObject-stubs
+requests
+beautifulsoup4
+ics
